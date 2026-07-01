@@ -1,0 +1,6 @@
+{
+  "name": "VaultShield",
+  "description": "Ironclad password manager hero interface and interactive game password safe personalized for Bold.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
