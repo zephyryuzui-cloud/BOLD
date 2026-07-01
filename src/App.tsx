@@ -5,10 +5,12 @@ import {
   Menu, X, Gamepad2, ShieldCheck, Trophy, Sparkles, AlertCircle
 } from 'lucide-react';
 import GamerVault from './components/GamerVault';
+import GamerArcade from './components/GamerArcade';
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [gamerVaultOpen, setGamerVaultOpen] = useState(false);
+  const [gamerArcadeOpen, setGamerArcadeOpen] = useState(false);
   const [hoverGamerBadge, setHoverGamerBadge] = useState(false);
 
   // Staggered fadeUp animation for hero elements
@@ -199,16 +201,16 @@ export default function App() {
             9 настай Болд шиг мундаг тоглогчдод зориулсан Zero stress хамгаалалт. Тоглоомын бүх данс, нууц үг, рекорд амжилтуудаа VaultShield-ээр найдвартай хадгалж, зөвхөн тоглоомондоо анхаарлаа хандуулаарай.
           </motion.p>
 
-          {/* Primary CTA Button */}
+          {/* Primary CTA Button with dual choices: Game or Safe */}
           <motion.div
             custom={2}
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="w-fit"
+            className="flex flex-wrap gap-4 items-center"
           >
             <motion.button
-              onClick={() => setGamerVaultOpen(true)}
+              onClick={() => setGamerArcadeOpen(true)}
               whileHover={{ scale: 1.04, filter: 'brightness(1.1)' }}
               whileTap={{ scale: 0.96 }}
               className="bg-[#7342E2] text-white flex items-center justify-between font-semibold tracking-tight transition-all cursor-pointer"
@@ -217,12 +219,29 @@ export default function App() {
                 padding: '17px 32px',
                 fontSize: 'clamp(0.95rem, 2vw, 1.125rem)',
                 boxShadow: '0 4px 24px rgba(115,66,226,0.28)',
-                minWidth: '240px',
-                gap: '32px'
+                minWidth: '220px',
+                gap: '24px'
               }}
             >
-              <span>Тоглож эхлэх</span>
-              <ArrowRightCircle className="w-5 h-5 text-white shrink-0" />
+              <span>Тоглож эхлэх 🎮</span>
+              <ArrowRightCircle className="w-5 h-5 text-white shrink-0 animate-pulse" />
+            </motion.button>
+
+            <motion.button
+              onClick={() => setGamerVaultOpen(true)}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              className="bg-white/80 backdrop-blur-md text-[#192837] border border-[#CFC8C5] hover:bg-white flex items-center justify-between font-semibold tracking-tight transition-all cursor-pointer"
+              style={{
+                borderRadius: '50px',
+                padding: '17px 32px',
+                fontSize: 'clamp(0.95rem, 2vw, 1.125rem)',
+                minWidth: '220px',
+                gap: '24px'
+              }}
+            >
+              <span>Миний Сейф 🔐</span>
+              <ShieldCheck className="w-5 h-5 text-[#7342E2] shrink-0" />
             </motion.button>
           </motion.div>
 
@@ -328,8 +347,23 @@ export default function App() {
                     }}
                     className="flex items-center gap-2 text-lg font-bold text-[#7342E2] text-left hover:opacity-80 transition-opacity"
                   >
+                    <ShieldCheck className="w-5 h-5" />
+                    <span>Болдын Сейф 🔐</span>
+                  </motion.button>
+
+                  {/* Special Mobile Game link */}
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.22 + navLinks.length * 0.07, duration: 0.3 }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setGamerArcadeOpen(true);
+                    }}
+                    className="flex items-center gap-2 text-lg font-bold text-[#A855F7] text-left hover:opacity-80 transition-opacity"
+                  >
                     <Gamepad2 className="w-5 h-5" />
-                    <span>Болдын Сейф 🎮</span>
+                    <span>Тоглож эхлэх 🎮</span>
                   </motion.button>
                 </div>
               </div>
@@ -366,6 +400,13 @@ export default function App() {
       <AnimatePresence>
         {gamerVaultOpen && (
           <GamerVault onClose={() => setGamerVaultOpen(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* 6. Custom Interactive Cyber Game Modal for Bold */}
+      <AnimatePresence>
+        {gamerArcadeOpen && (
+          <GamerArcade onClose={() => setGamerArcadeOpen(false)} language="mn" />
         )}
       </AnimatePresence>
 
