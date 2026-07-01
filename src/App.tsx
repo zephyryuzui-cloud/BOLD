@@ -2,15 +2,19 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowRightCircle, Zap, LockKeyhole, Fingerprint, 
-  Menu, X, Gamepad2, ShieldCheck, Trophy, Sparkles, AlertCircle
+  Menu, X, Gamepad2, ShieldCheck, Trophy, Sparkles, AlertCircle, Radio, Flame
 } from 'lucide-react';
 import GamerVault from './components/GamerVault';
 import GamerArcade from './components/GamerArcade';
+import GamerRadio from './components/GamerRadio';
+import GamerSurvival from './components/GamerSurvival';
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [gamerVaultOpen, setGamerVaultOpen] = useState(false);
   const [gamerArcadeOpen, setGamerArcadeOpen] = useState(false);
+  const [gamerRadioOpen, setGamerRadioOpen] = useState(false);
+  const [gamerSurvivalOpen, setGamerSurvivalOpen] = useState(false);
   const [hoverGamerBadge, setHoverGamerBadge] = useState(false);
 
   // Staggered fadeUp animation for hero elements
@@ -26,8 +30,6 @@ export default function App() {
       }
     })
   };
-
-  const navLinks = ['Vault', 'Plans', 'Install', 'News', 'Help'];
 
   return (
     <div id="vaultshield-root" className="relative w-full min-h-screen text-[#192837] overflow-x-hidden select-none" style={{ fontFamily: 'var(--font-body)' }}>
@@ -95,34 +97,36 @@ export default function App() {
           </div>
         </div>
 
-        {/* Center: Desktop Links */}
-        <div className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <a
-              key={link}
-              href={`#${link.toLowerCase()}`}
-              className="text-sm font-medium text-[#192837] opacity-80 hover:opacity-100 transition-opacity hover:translate-y-[-1px] duration-150"
-            >
-              {link}
-            </a>
-          ))}
-        </div>
+        {/* Right: Desktop Action CTAs - Fully functional */}
+        <div className="hidden md:flex items-center gap-4">
+          <button
+            onClick={() => setGamerRadioOpen(true)}
+            className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white/80 backdrop-blur-md border border-[#CFC8C5] hover:border-cyan-500 hover:bg-white text-[#192837] transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+          >
+            <span>Хөгжмийн булан 🎵</span>
+          </button>
 
-        {/* Right: Desktop Action CTAs */}
-        <div className="hidden md:flex items-center gap-3">
           <button
             onClick={() => setGamerVaultOpen(true)}
-            className="px-5 py-2.5 rounded-full text-sm font-medium bg-[#F2F2EE] border border-[#CFC8C5] hover:border-[#192837] hover:bg-white text-[#192837] transition-all duration-200 cursor-pointer active:scale-95"
+            className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white/80 backdrop-blur-md border border-[#CFC8C5] hover:border-[#7342E2] hover:bg-white text-[#192837] transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
           >
-            Sign In
+            <span>Миний Сейф 🔐</span>
           </button>
           
           <button
-            onClick={() => setGamerVaultOpen(true)}
-            className="px-5 py-2.5 rounded-full text-sm font-medium bg-[#7342E2] hover:bg-opacity-90 hover:shadow-lg text-white transition-all duration-200 cursor-pointer active:scale-95"
-            style={{ boxShadow: '0 4px 14px rgba(115,66,226,0.2)' }}
+            onClick={() => setGamerArcadeOpen(true)}
+            className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#7342E2] hover:bg-opacity-95 hover:shadow-lg text-white transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            style={{ boxShadow: '0 4px 14px rgba(115,66,226,0.25)' }}
           >
-            Start For Free
+            <span>Буудагч 🎮</span>
+          </button>
+
+          <button
+            onClick={() => setGamerSurvivalOpen(true)}
+            className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#10B981] hover:bg-opacity-95 hover:shadow-lg text-white transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            style={{ boxShadow: '0 4px 14px rgba(16,185,129,0.25)' }}
+          >
+            <span>Амьд үлдэх ⚔️</span>
           </button>
         </div>
 
@@ -321,33 +325,19 @@ export default function App() {
                 <div className="h-[1px] bg-[#192837]/10 mb-6" />
 
                 {/* Staggered Nav Links */}
-                <div className="flex flex-col gap-4">
-                  {navLinks.map((link, i) => (
-                    <motion.a
-                      key={link}
-                      href={`#${link.toLowerCase()}`}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.18 + i * 0.07, duration: 0.3 }}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="text-lg font-semibold text-[#192837] hover:opacity-80 transition-opacity"
-                    >
-                      {link}
-                    </motion.a>
-                  ))}
-
+                <div className="flex flex-col gap-6">
                   {/* Special Mobile Gaming Safe link */}
                   <motion.button
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.18 + navLinks.length * 0.07, duration: 0.3 }}
+                    transition={{ delay: 0.15, duration: 0.3 }}
                     onClick={() => {
                       setMobileMenuOpen(false);
                       setGamerVaultOpen(true);
                     }}
-                    className="flex items-center gap-2 text-lg font-bold text-[#7342E2] text-left hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-3 text-xl font-extrabold text-[#7342E2] text-left hover:opacity-80 transition-opacity"
                   >
-                    <ShieldCheck className="w-5 h-5" />
+                    <ShieldCheck className="w-6 h-6" />
                     <span>Болдын Сейф 🔐</span>
                   </motion.button>
 
@@ -355,40 +345,47 @@ export default function App() {
                   <motion.button
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.22 + navLinks.length * 0.07, duration: 0.3 }}
+                    transition={{ delay: 0.22, duration: 0.3 }}
                     onClick={() => {
                       setMobileMenuOpen(false);
                       setGamerArcadeOpen(true);
                     }}
-                    className="flex items-center gap-2 text-lg font-bold text-[#A855F7] text-left hover:opacity-80 transition-opacity"
+                    className="flex items-center gap-3 text-xl font-extrabold text-[#A855F7] text-left hover:opacity-80 transition-opacity"
                   >
-                    <Gamepad2 className="w-5 h-5" />
-                    <span>Тоглож эхлэх 🎮</span>
+                    <Gamepad2 className="w-6 h-6 animate-pulse" />
+                    <span>Буудагч 🎮</span>
+                  </motion.button>
+
+                  {/* Special Mobile Survival link */}
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.26, duration: 0.3 }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setGamerSurvivalOpen(true);
+                    }}
+                    className="flex items-center gap-3 text-xl font-extrabold text-[#10B981] text-left hover:opacity-80 transition-opacity"
+                  >
+                    <Flame className="w-6 h-6 animate-pulse text-yellow-500" />
+                    <span>Амьд үлдэх ⚔️</span>
+                  </motion.button>
+
+                  {/* Special Mobile Radio link */}
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.29, duration: 0.3 }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setGamerRadioOpen(true);
+                    }}
+                    className="flex items-center gap-3 text-xl font-extrabold text-cyan-500 text-left hover:opacity-80 transition-opacity"
+                  >
+                    <Radio className="w-6 h-6 animate-pulse" />
+                    <span>Хөгжмийн булан 🎵</span>
                   </motion.button>
                 </div>
-              </div>
-
-              {/* Bottom CTA Buttons matching desktop styles */}
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setGamerVaultOpen(true);
-                  }}
-                  className="w-full bg-[#F2F2EE] border border-[#CFC8C5] text-[#192837] font-semibold text-sm py-3 rounded-full active:scale-95 transition-all"
-                >
-                  Sign In
-                </button>
-                
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setGamerVaultOpen(true);
-                  }}
-                  className="w-full bg-[#7342E2] text-white font-semibold text-sm py-3 rounded-full active:scale-95 transition-all shadow-md"
-                >
-                  Start For Free
-                </button>
               </div>
 
             </motion.div>
@@ -407,6 +404,20 @@ export default function App() {
       <AnimatePresence>
         {gamerArcadeOpen && (
           <GamerArcade onClose={() => setGamerArcadeOpen(false)} language="mn" />
+        )}
+      </AnimatePresence>
+
+      {/* 7. Custom Gamer Music Player / Synthesizer for Bold */}
+      <AnimatePresence>
+        {gamerRadioOpen && (
+          <GamerRadio onClose={() => setGamerRadioOpen(false)} language="mn" />
+        )}
+      </AnimatePresence>
+
+      {/* 8. Custom Interactive Survival Game Modal for Bold */}
+      <AnimatePresence>
+        {gamerSurvivalOpen && (
+          <GamerSurvival onClose={() => setGamerSurvivalOpen(false)} language="mn" />
         )}
       </AnimatePresence>
 
