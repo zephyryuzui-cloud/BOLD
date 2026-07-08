@@ -38,71 +38,141 @@ interface Particle {
   maxLife: number;
 }
 
+const generateDalgonaPoints = (shape: string) => {
+  const points: { x: number; y: number; carved: boolean }[] = [];
+  if (shape === 'triangle') {
+    const v = [
+      { x: 150, y: 70 },
+      { x: 75, y: 210 },
+      { x: 225, y: 210 }
+    ];
+    // Interpolate side 1
+    for (let i = 0; i < 6; i++) {
+      points.push({ x: v[0].x + (v[1].x - v[0].x) * (i / 6), y: v[0].y + (v[1].y - v[0].y) * (i / 6), carved: false });
+    }
+    // Interpolate side 2
+    for (let i = 0; i < 6; i++) {
+      points.push({ x: v[1].x + (v[2].x - v[1].x) * (i / 6), y: v[1].y + (v[2].y - v[1].y) * (i / 6), carved: false });
+    }
+    // Interpolate side 3
+    for (let i = 0; i < 6; i++) {
+      points.push({ x: v[2].x + (v[0].x - v[2].x) * (i / 6), y: v[2].y + (v[0].y - v[2].y) * (i / 6), carved: false });
+    }
+  } else if (shape === 'circle') {
+    for (let i = 0; i < 16; i++) {
+      const angle = (i * Math.PI * 2) / 16;
+      points.push({
+        x: 150 + 70 * Math.cos(angle),
+        y: 150 + 70 * Math.sin(angle),
+        carved: false
+      });
+    }
+  } else if (shape === 'star') {
+    for (let i = 0; i < 10; i++) {
+      const r = i % 2 === 0 ? 80 : 35;
+      const angle = (i * Math.PI) / 5 - Math.PI / 2;
+      points.push({
+        x: 150 + r * Math.cos(angle),
+        y: 150 + r * Math.sin(angle),
+        carved: false
+      });
+      // Interpolate midpoint
+      const nextR = (i + 1) % 2 === 0 ? 80 : 35;
+      const nextAngle = ((i + 1) * Math.PI) / 5 - Math.PI / 2;
+      const midX = (150 + r * Math.cos(angle) + (150 + nextR * Math.cos(nextAngle))) / 2;
+      const midY = (150 + r * Math.sin(angle) + (150 + nextR * Math.sin(nextAngle))) / 2;
+      points.push({ x: midX, y: midY, carved: false });
+    }
+  } else {
+    // umbrella
+    // Canopy arc
+    for (let i = 0; i <= 8; i++) {
+      const angle = -Math.PI + (i * Math.PI) / 8;
+      points.push({
+        x: 150 + 75 * Math.cos(angle),
+        y: 150 + 55 * Math.sin(angle),
+        carved: false
+      });
+    }
+    // Bottom waves
+    for (let i = 0; i <= 4; i++) {
+      points.push({ x: 75 + i * 37.5, y: 150, carved: false });
+    }
+    // Handle stem
+    points.push({ x: 150, y: 165, carved: false });
+    points.push({ x: 150, y: 185, carved: false });
+    points.push({ x: 150, y: 205, carved: false });
+    points.push({ x: 140, y: 215, carved: false });
+    points.push({ x: 125, y: 210, carved: false });
+  }
+  return points;
+};
+
 const LEVELS = [
   {
     num: 1,
-    nameMn: 'Үе 1: Эхлэгч (Сургуулийн талбай)',
-    nameEn: 'Level 1: Greenhorn (Playground)',
+    nameMn: '1-р Тоглоом: Улаан гэрэл, Ногоон гэрэл',
+    nameEn: 'Game 1: Red Light, Green Light',
     aiStepProb: 0.02,
     aiReactionMin: 0.40,
     aiReactionMax: 0.60,
     chantSpeedMin: 0.75,
     chantSpeedMax: 1.05,
     prizePerSurvivor: 4.1,
-    titleMn: 'Элсэн Цөл',
-    titleEn: 'Sandy Arena',
+    titleMn: 'Сургуулийн талбай',
+    titleEn: 'Playground',
   },
   {
     num: 2,
-    nameMn: 'Үе 2: Хашир (Харанхуй талбай)',
-    nameEn: 'Level 2: Hardened (Dark Arena)',
+    nameMn: '2-р Тоглоом: Чихэрний хээ (Dalgona)',
+    nameEn: 'Game 2: Honeycomb Candy (Dalgona)',
     aiStepProb: 0.03,
     aiReactionMin: 0.30,
     aiReactionMax: 0.48,
     chantSpeedMin: 0.95,
     chantSpeedMax: 1.35,
     prizePerSurvivor: 6.2,
-    titleMn: 'Шаварлаг Хөндий',
-    titleEn: 'Muddy Valley',
+    titleMn: 'Тамгатай Далгона',
+    titleEn: 'Stamped Dalgona',
   },
   {
     num: 3,
-    nameMn: 'Үе 3: Мэргэжил (Манантай хөндий)',
-    nameEn: 'Level 3: Professional (Misty Valley)',
+    nameMn: '3-р Тоглоом: Олс таталт',
+    nameEn: 'Game 3: Tug of War',
     aiStepProb: 0.04,
     aiReactionMin: 0.22,
     aiReactionMax: 0.38,
     chantSpeedMin: 1.15,
     chantSpeedMax: 1.65,
     prizePerSurvivor: 9.5,
-    titleMn: 'Бүрхэг Тал',
-    titleEn: 'Gloomy Fields',
+    titleMn: 'Олсны Талбай',
+    titleEn: 'Tug Platform',
   },
   {
     num: 4,
-    nameMn: 'Үе 4: Элит (Аюултай бүс)',
-    nameEn: 'Level 4: Elite (Danger Zone)',
+    nameMn: '4-р Тоглоом: Марблс (Тэгш Сондгой)',
+    nameEn: 'Game 4: Marbles (Odd or Even)',
     aiStepProb: 0.05,
     aiReactionMin: 0.15,
     aiReactionMax: 0.30,
     chantSpeedMin: 1.35,
     chantSpeedMax: 2.05,
     prizePerSurvivor: 12.0,
-    titleMn: 'Манантай Хорго',
-    titleEn: 'Mist Shelter',
+    titleMn: 'Гэр хороолол',
+    titleEn: 'Alleyway',
   },
   {
     num: 5,
-    nameMn: 'Үе 5: Сүүлчийн тулаан (Хүүхэлдэйн Орон)',
-    nameEn: 'Level 5: Grand Finale (Palace)',
+    nameMn: '5-р Тоглоом: Шилэн гүүр',
+    nameEn: 'Game 5: Glass Stepping Stones',
     aiStepProb: 0.06,
     aiReactionMin: 0.08,
     aiReactionMax: 0.24,
     chantSpeedMin: 1.60,
     chantSpeedMax: 2.60,
     prizePerSurvivor: 20.0,
-    titleMn: 'Озин Хүүхэлдэйн Орон',
-    titleEn: 'Young-hee Palace',
+    titleMn: 'Шилэн талбар',
+    titleEn: 'Glass Canopy',
   },
 ];
 
@@ -125,6 +195,76 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
   const [chantProgress, setChantProgress] = useState(0); // 0 to 1
   const [lastFoot, setLastFoot] = useState<'LEFT' | 'RIGHT' | null>(null);
   const [stumbleActive, setStumbleActive] = useState(false);
+
+  // ==================== SUB-GAMES STATE ====================
+  // Level 2: Dalgona
+  const [dalgonaShape, setDalgonaShape] = useState<'triangle' | 'circle' | 'star' | 'umbrella'>('triangle');
+  const [dalgonaPoints, setDalgonaPoints] = useState<{ x: number; y: number; carved: boolean }[]>([]);
+  const [dalgonaIntegrity, setDalgonaIntegrity] = useState(100);
+  const [dalgonaLicks, setDalgonaLicks] = useState(0);
+
+  // Level 3: Tug of War
+  const [tugSlider, setTugSlider] = useState(50);
+  const [tugDirection, setTugDirection] = useState<'LEFT' | 'RIGHT'>('RIGHT');
+  const [tugRopeOffset, setTugRopeOffset] = useState(0); // -100 to 100, 0 is center
+  const [tugPerfectCount, setTugPerfectCount] = useState(0);
+
+  // Level 4: Marbles
+  const [playerMarbles, setPlayerMarbles] = useState(10);
+  const [aiMarbles, setAiMarbles] = useState(10);
+  const [marbleBet, setMarbleBet] = useState(2);
+  const [marblePhase, setMarblePhase] = useState<'betting' | 'guessing' | 'showing' | 'result'>('betting');
+  const [isPlayerDealer, setIsPlayerDealer] = useState(true);
+  const [aiHiddenCount, setAiHiddenCount] = useState(3);
+  const [playerHiddenCount, setPlayerHiddenCount] = useState(3);
+  const [playerChoice, setPlayerChoice] = useState<'odd' | 'even' | null>(null);
+  const [aiChoice, setAiChoice] = useState<'odd' | 'even' | null>(null);
+  const [marbleFeedback, setMarbleFeedback] = useState('');
+
+  // Level 5: Glass Bridge
+  const [glassSequence, setGlassSequence] = useState<('L' | 'R')[]>([]);
+  const [glassCurrentRow, setGlassCurrentRow] = useState(-1); // -1 is start platform, 0-7 are steps
+  const [glassMarblesCount, setGlassMarblesCount] = useState(2);
+  const [glassStatusList, setGlassStatusList] = useState<('normal' | 'broken' | 'safe')[][]>([]); // 8 rows, each having 2 items: [Left, Right]
+  const [glassActiveMode, setGlassActiveMode] = useState<'step' | 'throw'>('step');
+
+  const initializeSubGames = (startLvl: number) => {
+    // Level 2 reset
+    if (startLvl === 2) {
+      const shapes: ('triangle' | 'circle' | 'star' | 'umbrella')[] = ['triangle', 'circle', 'star', 'umbrella'];
+      const chosen = shapes[Math.floor(Math.random() * shapes.length)];
+      setDalgonaShape(chosen);
+      setDalgonaPoints(generateDalgonaPoints(chosen));
+      setDalgonaIntegrity(100);
+      setDalgonaLicks(0);
+    }
+    // Level 3 reset
+    if (startLvl === 3) {
+      setTugSlider(10);
+      setTugDirection('RIGHT');
+      setTugRopeOffset(0);
+      setTugPerfectCount(0);
+    }
+    // Level 4 reset
+    if (startLvl === 4) {
+      setPlayerMarbles(10);
+      setAiMarbles(10);
+      setMarbleBet(2);
+      setMarblePhase('betting');
+      setIsPlayerDealer(Math.random() > 0.5);
+      setPlayerChoice(null);
+      setAiChoice(null);
+      setMarbleFeedback('');
+    }
+    // Level 5 reset
+    if (startLvl === 5) {
+      const seq: ('L' | 'R')[] = Array.from({ length: 8 }, () => Math.random() > 0.5 ? 'L' : 'R');
+      setGlassSequence(seq);
+      setGlassCurrentRow(-1);
+      setGlassMarblesCount(2);
+      setGlassStatusList(Array.from({ length: 8 }, () => ['normal', 'normal']));
+    }
+  };
   
   // High scores & stats
   const [bestTime, setBestTime] = useState<number>(() => {
@@ -288,7 +428,7 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
 
   // Triggering the next round of chant
   const triggerChantLoop = (speed: number) => {
-    if (gameState !== 'playing') return;
+    if (gameState !== 'playing' || engineRef.current.level !== 1) return;
     
     let noteIndex = 0;
     const baseDuration = 0.16 / speed; // faster or slower chant duration per beat
@@ -427,6 +567,7 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
     };
 
     engine.runners = [playerRunner, ...aiRunners];
+    initializeSubGames(startLvl);
   };
 
   // Sync core state hooks to engine ref to prevent stale closures in game loop
@@ -534,6 +675,286 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
     setTimeout(() => playSynthTone(784, 0.4, 'sine', 0.25), 450); // G5
   };
 
+  // ==================== SUB-GAMES PLAY LOGIC ====================
+  // Level 2: Dalgona Carving
+  const carveDalgonaPoint = (index: number) => {
+    if (gameState !== 'playing' || level !== 2) return;
+    if (dalgonaPoints[index].carved) return;
+
+    // Must click in sequential order
+    const firstUncarved = dalgonaPoints.findIndex(p => !p.carved);
+    if (index !== firstUncarved) {
+      // Needle slipped! Slip decreases integrity
+      setDalgonaIntegrity(prev => {
+        const damage = 8 + Math.floor(Math.random() * 8);
+        const next = prev - damage;
+        if (next <= 0) {
+          playSynthTone(120, 0.4, 'sawtooth', 0.25);
+          handleElimination('shot');
+          return 0;
+        }
+        playSynthTone(330, 0.08, 'sawtooth', 0.15); // slip warning sound
+        return next;
+      });
+      return;
+    }
+
+    // Succesful carve point
+    const updated = [...dalgonaPoints];
+    updated[index].carved = true;
+    setDalgonaPoints(updated);
+
+    playSynthTone(750 + index * 10, 0.04, 'triangle', 0.1);
+
+    if (updated.every(p => p.carved)) {
+      handleVictory(60 - timeLeft);
+    }
+  };
+
+  const lickDalgona = () => {
+    if (gameState !== 'playing' || level !== 2) return;
+    setDalgonaLicks(prev => prev + 1);
+    setDalgonaIntegrity(prev => Math.min(100, prev + 15));
+    playSynthTone(600, 0.1, 'sine', 0.15); // Licking sound
+  };
+
+  // Level 3: Tug of War pull mechanics
+  const pullTugOfWar = () => {
+    if (gameState !== 'playing' || level !== 3) return;
+
+    const pos = tugSlider;
+    if (pos >= 40 && pos <= 60) {
+      // Perfect pulling!
+      setTugPerfectCount(prev => prev + 1);
+      setTugRopeOffset(prev => {
+        const next = Math.min(100, prev + 18);
+        if (next >= 100) {
+          handleVictory(60 - timeLeft);
+        }
+        return next;
+      });
+      playSynthTone(880, 0.15, 'sine', 0.2);
+    } else if (pos >= 25 && pos <= 75) {
+      // Good pulling!
+      setTugRopeOffset(prev => {
+        const next = Math.min(100, prev + 8);
+        if (next >= 100) {
+          handleVictory(60 - timeLeft);
+        }
+        return next;
+      });
+      playSynthTone(440, 0.12, 'sine', 0.15);
+    } else {
+      // Missed timing! Opposing guards pull massively
+      setTugRopeOffset(prev => {
+        const next = Math.max(-100, prev - 12);
+        if (next <= -100) {
+          handleElimination('shot');
+        }
+        return next;
+      });
+      playSynthTone(180, 0.2, 'sawtooth', 0.15);
+    }
+  };
+
+  // Level 3 Tug of War sliding bar effect loop
+  useEffect(() => {
+    if (gameState !== 'playing' || level !== 3) return;
+
+    let sliderVal = 10;
+    let vel = 5 + (level * 0.5); // speed increases based on level
+
+    const interval = setInterval(() => {
+      sliderVal += vel;
+      if (sliderVal >= 100) {
+        sliderVal = 100;
+        vel = -vel;
+      } else if (sliderVal <= 0) {
+        sliderVal = 0;
+        vel = -vel;
+      }
+      setTugSlider(sliderVal);
+      setTugDirection(vel > 0 ? 'RIGHT' : 'LEFT');
+
+      // Heavy constant pull from AI guard team
+      setTugRopeOffset(prev => {
+        const decay = 0.45 + (level * 0.1);
+        const next = prev - decay;
+        if (next <= -100) {
+          handleElimination('shot');
+          return -100;
+        }
+        return next;
+      });
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, [gameState, level]);
+
+  // Level 4: Marbles Guessing and Betting
+  const playMarblesRound = (guess: 'odd' | 'even') => {
+    if (gameState !== 'playing' || level !== 4 || marblePhase !== 'guessing') return;
+
+    const actual = aiHiddenCount;
+    const isActualEven = actual % 2 === 0;
+    const actualType = isActualEven ? 'even' : 'odd';
+    const isCorrect = guess === actualType;
+
+    let nextPlayer = playerMarbles;
+    let nextAi = aiMarbles;
+    let feedback = '';
+
+    if (isCorrect) {
+      const count = Math.min(marbleBet, aiMarbles);
+      nextPlayer += count;
+      nextAi -= count;
+      feedback = language === 'mn' 
+        ? `Зөв! Тэр ${actual} ширхэг нуусан байв. Та ${count} шагай хожлоо!` 
+        : `Correct! They hid ${actual} (${actualType}). You win ${count} marbles!`;
+      playSynthTone(600, 0.12, 'sine', 0.15);
+    } else {
+      const count = Math.min(marbleBet, playerMarbles);
+      nextPlayer -= count;
+      nextAi += count;
+      feedback = language === 'mn'
+        ? `Буруу! Тэр ${actual} ширхэг нуусан байв. Та ${count} шагай алдлаа!`
+        : `Wrong! They hid ${actual} (${actualType}). You lose ${count} marbles!`;
+      playSynthTone(200, 0.18, 'sawtooth', 0.15);
+    }
+
+    setPlayerMarbles(nextPlayer);
+    setAiMarbles(nextAi);
+    setMarbleFeedback(feedback);
+    setMarblePhase('showing');
+
+    setTimeout(() => {
+      if (nextPlayer >= 20) {
+        handleVictory(60 - timeLeft);
+      } else if (nextPlayer <= 0) {
+        handleElimination('shot');
+      } else {
+        setIsPlayerDealer(true);
+        setMarblePhase('betting');
+        setAiHiddenCount(Math.floor(Math.random() * 5) + 1);
+        setPlayerHiddenCount(3);
+      }
+    }, 2500);
+  };
+
+  const handlePlayerHideMarbles = (hiddenCount: number) => {
+    if (gameState !== 'playing' || level !== 4 || marblePhase !== 'betting') return;
+
+    setPlayerHiddenCount(hiddenCount);
+
+    const aiBetAmt = Math.min(Math.floor(Math.random() * 4) + 1, aiMarbles, playerMarbles);
+    const aiGuessChoice: 'odd' | 'even' = Math.random() > 0.5 ? 'odd' : 'even';
+
+    const actual = hiddenCount;
+    const isActualEven = actual % 2 === 0;
+    const actualType = isActualEven ? 'even' : 'odd';
+    const isAiCorrect = aiGuessChoice === actualType;
+
+    let nextPlayer = playerMarbles;
+    let nextAi = aiMarbles;
+    let feedback = '';
+
+    if (isAiCorrect) {
+      const count = Math.min(aiBetAmt, playerMarbles);
+      nextPlayer -= count;
+      nextAi += count;
+      feedback = language === 'mn'
+        ? `Өрсөлдөгч зөв таав! Тэр "Тэгш/Сондгой"-г зөв тааж, танаас ${count} шагай хожлоо!`
+        : `Opponent guessed correctly! They guessed "${aiGuessChoice}" and win ${count} of your marbles!`;
+      playSynthTone(200, 0.18, 'sawtooth', 0.15);
+    } else {
+      const count = Math.min(aiBetAmt, aiMarbles);
+      nextPlayer += count;
+      nextAi -= count;
+      feedback = language === 'mn'
+        ? `Өрсөлдөгч буруу таав! Тэр "${aiGuessChoice}" гэж таамагласан тул та ${count} шагай хожлоо!`
+        : `Opponent guessed wrong! They guessed "${aiGuessChoice}". You win ${count} of their marbles!`;
+      playSynthTone(600, 0.12, 'sine', 0.15);
+    }
+
+    setPlayerMarbles(nextPlayer);
+    setAiMarbles(nextAi);
+    setMarbleFeedback(feedback);
+    setMarblePhase('showing');
+
+    setTimeout(() => {
+      if (nextPlayer >= 20) {
+        handleVictory(60 - timeLeft);
+      } else if (nextPlayer <= 0) {
+        handleElimination('shot');
+      } else {
+        setIsPlayerDealer(false);
+        setMarblePhase('guessing');
+        setAiHiddenCount(Math.floor(Math.random() * 5) + 1);
+      }
+    }, 2500);
+  };
+
+  // Level 5: Glass Bridge jumping
+  const jumpGlassBridge = (side: 'L' | 'R') => {
+    if (gameState !== 'playing' || level !== 5) return;
+    
+    const nextRow = glassCurrentRow + 1;
+    if (nextRow >= 8) return;
+
+    const correctSide = glassSequence[nextRow];
+    const isCorrect = side === correctSide;
+
+    const updated = [...glassStatusList];
+    
+    if (isCorrect) {
+      updated[nextRow][side === 'L' ? 0 : 1] = 'safe';
+      setGlassStatusList(updated);
+      setGlassCurrentRow(nextRow);
+      playSynthTone(700, 0.08, 'sine', 0.2); // firm step clink
+
+      if (nextRow === 7) {
+        setTimeout(() => {
+          handleVictory(60 - timeLeft);
+        }, 800);
+      }
+    } else {
+      updated[nextRow][side === 'L' ? 0 : 1] = 'broken';
+      setGlassStatusList(updated);
+      
+      // Glass shatters sound sequence
+      playSynthTone(1200, 0.15, 'sawtooth', 0.25);
+      setTimeout(() => playSynthTone(900, 0.12, 'sawtooth', 0.2), 60);
+      setTimeout(() => playSynthTone(550, 0.2, 'sawtooth', 0.15), 120);
+
+      setTimeout(() => {
+        handleElimination('shot');
+      }, 400);
+    }
+  };
+
+  const throwGlassMarble = (side: 'L' | 'R') => {
+    if (gameState !== 'playing' || level !== 5) return;
+    if (glassMarblesCount <= 0) return;
+
+    const nextRow = glassCurrentRow + 1;
+    if (nextRow >= 8) return;
+
+    const correctSide = glassSequence[nextRow];
+    const isCorrect = side === correctSide;
+
+    setGlassMarblesCount(prev => prev - 1);
+
+    const updated = [...glassStatusList];
+    if (isCorrect) {
+      playSynthTone(950, 0.08, 'sine', 0.25); // Safe tempered glass ring
+      updated[nextRow][side === 'L' ? 0 : 1] = 'safe';
+    } else {
+      playSynthTone(1100, 0.15, 'sawtooth', 0.2); // Broken glass crash
+      updated[nextRow][side === 'L' ? 0 : 1] = 'broken';
+    }
+    setGlassStatusList(updated);
+  };
+
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -541,12 +962,21 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
       if (engine.gameState !== 'playing') return;
       
       const key = e.key.toLowerCase();
+
+      // Custom Tug of War Spacebar hook
+      if (engine.level === 3) {
+        if (e.key === ' ' || key === 'w' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          pullTugOfWar();
+        }
+        return;
+      }
+
       if (key === 'a' || e.key === 'ArrowLeft') {
         performStep('LEFT');
       } else if (key === 'd' || e.key === 'ArrowRight') {
         performStep('RIGHT');
       } else if (key === 'w' || e.key === 'ArrowUp' || key === ' ') {
-        // Auto-alternate step for accessibility and fluidity
         const nextFoot = engine.lastFoot === 'LEFT' ? 'RIGHT' : 'LEFT';
         performStep(nextFoot);
       }
@@ -554,7 +984,7 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameState]);
+  }, [gameState, level, tugSlider]);
 
   // Player action: move by stepping
   const performStep = (foot: 'LEFT' | 'RIGHT') => {
@@ -661,6 +1091,7 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
 
   // Primary animation game loop
   const gameLoop = (timestamp: number) => {
+    if (engineRef.current.level !== 1) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -1221,20 +1652,328 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
           {/* Absolute Background atmospheric noise */}
           <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-10" />
           
-          <canvas
-            id="squid-viewport"
-            ref={canvasRef}
-            width={400}
-            height={480}
-            className="rounded-lg bg-[#dfc49f] border-4 border-black shadow-inner max-w-full aspect-[400/480] h-full object-contain cursor-pointer"
-            onClick={() => {
-              const engine = engineRef.current;
-              if (engine.gameState !== 'playing') return;
-              // Auto-alternate step on click/tap anywhere on the canvas
-              const nextFoot = engine.lastFoot === 'LEFT' ? 'RIGHT' : 'LEFT';
-              performStep(nextFoot);
-            }}
-          />
+          {level === 1 ? (
+            <canvas
+              id="squid-viewport"
+              ref={canvasRef}
+              width={400}
+              height={480}
+              className="rounded-lg bg-[#dfc49f] border-4 border-black shadow-inner max-w-full aspect-[400/480] h-full object-contain cursor-pointer"
+              onClick={() => {
+                const engine = engineRef.current;
+                if (engine.gameState !== 'playing') return;
+                const nextFoot = engine.lastFoot === 'LEFT' ? 'RIGHT' : 'LEFT';
+                performStep(nextFoot);
+              }}
+            />
+          ) : level === 2 ? (
+            <div className="flex flex-col items-center justify-center w-full h-full max-w-[320px] mx-auto p-2 select-none z-10">
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-amber-800/30 p-2 border-2 border-amber-900/50 flex items-center justify-center">
+                <div className="absolute inset-2 rounded-full bg-gradient-to-br from-yellow-400 via-amber-500 to-amber-700 shadow-[inset_0_4px_12px_rgba(255,255,255,0.4),0_8px_24px_rgba(0,0,0,0.5)] flex items-center justify-center overflow-hidden border border-amber-800">
+                  <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#000_15%,transparent_16%)] bg-[length:6px_6px]" />
+                  
+                  <svg width="240" height="240" viewBox="0 0 300 300" className="relative z-10 w-full h-full p-2">
+                    <path
+                      d={
+                        dalgonaShape === 'triangle' ? "M150,70 L75,210 L225,210 Z" :
+                        dalgonaShape === 'circle' ? "M150,150 m-70,0 a70,70 0 1,1 140,0 a70,70 0 1,1 -140,0" :
+                        dalgonaShape === 'star' ? "M150,70 L170,115 L225,115 L180,150 L197,195 L150,165 L103,195 L120,150 L75,115 L130,115 Z" :
+                        "M75,150 A75,55 0 0,1 225,150 Q187.5,150 187.5,150 Q150,150 150,150 Q112.5,150 112.5,150 L75,150 M150,150 L150,205 Q150,215 140,215 Q125,210 125,210"
+                      }
+                      fill="none"
+                      stroke="#451a03"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="opacity-75"
+                    />
+                    
+                    {dalgonaPoints.map((pt, idx) => {
+                      const isNext = idx === dalgonaPoints.findIndex(p => !p.carved);
+                      return (
+                        <circle
+                          key={idx}
+                          cx={pt.x}
+                          cy={pt.y}
+                          r={pt.carved ? 7 : isNext ? 11 : 6}
+                          className={`cursor-pointer transition-all duration-150 ${
+                            pt.carved 
+                              ? 'fill-amber-350 stroke-amber-950 stroke-2 shadow-sm' 
+                              : isNext 
+                                ? 'fill-pink-500 stroke-white stroke-2 animate-pulse' 
+                                : 'fill-amber-950/35 stroke-amber-850'
+                          }`}
+                          onClick={() => {
+                            initAudio();
+                            carveDalgonaPoint(idx);
+                          }}
+                        />
+                      );
+                    })}
+                  </svg>
+                  
+                  {dalgonaIntegrity < 40 && (
+                    <div className="absolute inset-0 pointer-events-none bg-red-950/20 backdrop-brightness-50 flex items-center justify-center">
+                      <div className="text-red-500 font-black tracking-widest text-lg uppercase animate-ping">CRACKING!</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : level === 3 ? (
+            <div className="flex flex-col items-center justify-between w-full h-full p-2 select-none bg-slate-950/60 rounded-xl z-10 max-w-sm">
+              <div className="relative w-full h-44 bg-slate-900/90 border border-slate-800 rounded-lg overflow-hidden flex items-center justify-between px-3">
+                <div className="absolute left-0 bottom-0 top-1/4 w-24 bg-emerald-950/30 border-r-2 border-emerald-500/20 flex flex-col justify-end p-1 items-center">
+                  <div className="text-emerald-400 text-[8px] font-mono mb-1 uppercase tracking-wider font-bold">
+                    {language === 'mn' ? 'ТА ХОЛБООТНУУД' : 'YOUR TEAM'}
+                  </div>
+                  <div className="flex gap-1">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="flex flex-col items-center animate-bounce" style={{ animationDelay: `${i * 120}ms` }}>
+                        <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 border border-white" />
+                        <div className="w-1 h-5 bg-emerald-600 rounded-sm" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="absolute right-0 bottom-0 top-1/4 w-24 bg-pink-950/30 border-l-2 border-pink-500/20 flex flex-col justify-end p-1 items-center">
+                  <div className="text-pink-400 text-[8px] font-mono mb-1 uppercase tracking-wider font-bold">
+                    {language === 'mn' ? 'ХАМГААЛАГЧИД' : 'GUARD TEAM'}
+                  </div>
+                  <div className="flex gap-1">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="flex flex-col items-center animate-pulse" style={{ animationDelay: `${i * 150}ms` }}>
+                        <div className="w-3.5 h-3.5 rounded-full bg-pink-500 border border-black flex items-center justify-center text-[6px] text-white">▲</div>
+                        <div className="w-1 h-5 bg-pink-600 rounded-sm" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="absolute inset-x-20 top-2/3 h-1.5 bg-yellow-800/50 flex items-center justify-center">
+                  <div 
+                    className="absolute w-3.5 h-5 bg-red-600 border border-white shadow-md transition-all duration-100"
+                    style={{ left: `calc(50% + ${tugRopeOffset}px)` }}
+                  >
+                    <div className="absolute top-full left-1/2 w-0.5 h-4 bg-white" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full mt-3 bg-slate-900/95 p-3 rounded-xl border border-slate-850">
+                <div className="relative h-5 bg-slate-950 rounded-full border border-slate-800 overflow-hidden mb-2">
+                  <div className="absolute inset-y-0 left-1/4 right-1/4 bg-yellow-500/15" />
+                  <div className="absolute inset-y-0 left-[40%] right-[40%] bg-emerald-500/25 border-x border-emerald-500/40" />
+                  
+                  <div 
+                    className="absolute top-0 bottom-0 w-1.5 bg-white shadow-[0_0_8px_white] transition-all duration-75"
+                    style={{ left: `${tugSlider}%` }}
+                  />
+                </div>
+
+                <button
+                  onClick={() => {
+                    initAudio();
+                    pullTugOfWar();
+                  }}
+                  className="w-full py-2 rounded-lg bg-pink-600 hover:bg-pink-500 active:scale-95 text-white font-black uppercase tracking-widest text-[10px] transition-all shadow-[0_0_12px_rgba(236,72,153,0.3)]"
+                >
+                  {language === 'mn' ? 'ТАТАХ (Spacebar) 💪' : 'PULL (Spacebar) 💪'}
+                </button>
+              </div>
+            </div>
+          ) : level === 4 ? (
+            <div className="flex flex-col items-center justify-between w-full h-full p-2 bg-slate-950/60 rounded-xl select-none z-10 max-w-sm">
+              <div className="grid grid-cols-2 gap-3 w-full mb-2">
+                <div className="bg-emerald-950/25 border border-emerald-500/15 p-2 rounded-lg text-center">
+                  <div className="text-[8px] font-mono text-emerald-400 uppercase tracking-wider font-bold mb-0.5">
+                    {language === 'mn' ? 'Таны Шагай' : 'Your Marbles'}
+                  </div>
+                  <div className="text-lg font-black text-emerald-300 font-mono flex items-center justify-center gap-1">
+                    🔵 <span className="text-xl">{playerMarbles}</span>
+                  </div>
+                </div>
+
+                <div className="bg-red-950/25 border border-red-500/15 p-2 rounded-lg text-center">
+                  <div className="text-[8px] font-mono text-red-400 uppercase tracking-wider font-bold mb-0.5">
+                    {language === 'mn' ? 'Өрсөлдөгч (001)' : 'Opponent (001)'}
+                  </div>
+                  <div className="text-lg font-black text-red-300 font-mono flex items-center justify-center gap-1">
+                    🔴 <span className="text-xl">{aiMarbles}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 w-full bg-slate-900 border border-slate-800 rounded-lg p-3 flex flex-col items-center justify-center text-center">
+                {marblePhase === 'betting' && isPlayerDealer && (
+                  <div className="animate-fade-in">
+                    <p className="text-[11px] font-bold text-pink-400 mb-1 uppercase tracking-widest font-mono">
+                      {language === 'mn' ? 'ШАГАЙ НУУХ ҮЕ!' : 'YOUR TURN TO HIDE!'}
+                    </p>
+                    <p className="text-[9px] text-slate-400 mb-3">
+                      {language === 'mn' ? 'Гартаа хэдэн шагай нуух вэ?' : 'Choose how many marbles to hide in your hand.'}
+                    </p>
+                    
+                    <div className="flex justify-center gap-1.5">
+                      {Array.from({ length: Math.min(5, playerMarbles) }, (_, i) => i + 1).map((n) => (
+                        <button
+                          key={n}
+                          onClick={() => {
+                            initAudio();
+                            handlePlayerHideMarbles(n);
+                          }}
+                          className="w-9 h-9 rounded-full bg-slate-950 border border-emerald-500 text-emerald-400 font-black hover:bg-emerald-500 hover:text-white transition-all text-xs active:scale-95"
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {marblePhase === 'guessing' && !isPlayerDealer && (
+                  <div className="animate-fade-in w-full max-w-[240px]">
+                    <p className="text-[11px] font-bold text-pink-400 mb-1 uppercase tracking-widest font-mono">
+                      {language === 'mn' ? 'ТА ТААХ ҮЕ!' : 'YOUR TURN TO GUESS!'}
+                    </p>
+                    
+                    <div className="mb-2.5">
+                      <p className="text-[8px] text-slate-400 uppercase mb-0.5">
+                        {language === 'mn' ? 'Дэнчин (Мөрий):' : 'Bet Size:'} {marbleBet}
+                      </p>
+                      <input
+                        type="range"
+                        min="1"
+                        max={Math.min(playerMarbles, aiMarbles, 5)}
+                        value={marbleBet}
+                        onChange={(e) => setMarbleBet(Number(e.target.value))}
+                        className="w-full h-1 bg-slate-950 rounded cursor-pointer accent-pink-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => {
+                          initAudio();
+                          playMarblesRound('odd');
+                        }}
+                        className="py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-black text-[10px] uppercase transition-all tracking-wider"
+                      >
+                        {language === 'mn' ? 'СОНДГОЙ' : 'ODD'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          initAudio();
+                          playMarblesRound('even');
+                        }}
+                        className="py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-black text-[10px] uppercase transition-all tracking-wider"
+                      >
+                        {language === 'mn' ? 'ТЭГШ' : 'EVEN'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {marblePhase === 'showing' && (
+                  <div className="flex flex-col items-center justify-center p-2">
+                    <div className="w-12 h-12 rounded-full bg-pink-500/10 border border-pink-500 flex items-center justify-center mb-1 text-2xl animate-bounce">
+                      ✊
+                    </div>
+                    <p className="text-[10px] text-slate-300">
+                      {marbleFeedback}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-between w-full h-full p-2 bg-slate-950/60 rounded-xl select-none z-10 max-w-sm">
+              <div className="flex-1 w-full bg-slate-900 border border-slate-800 rounded-lg p-2 flex flex-col justify-end overflow-y-auto max-h-[260px] sm:max-h-[300px]">
+                <div className="flex flex-col gap-1 w-full max-w-[220px] mx-auto">
+                  {Array.from({ length: 8 }, (_, i) => 7 - i).map((rowIdx) => {
+                    const isCurrentPlayerRow = glassCurrentRow === rowIdx;
+                    const isNextInteractiveRow = rowIdx === glassCurrentRow + 1;
+                    
+                    return (
+                      <div key={rowIdx} className={`flex items-center gap-1.5 p-0.5 rounded transition-all ${
+                        isNextInteractiveRow ? 'bg-pink-500/5 border border-pink-500/15' : ''
+                      }`}>
+                        <span className="text-[8px] font-mono text-slate-500 font-bold w-3">{rowIdx + 1}</span>
+
+                        <button
+                          onClick={() => {
+                            initAudio();
+                            if (glassActiveMode === 'step') jumpGlassBridge('L');
+                            else throwGlassMarble('L');
+                          }}
+                          className={`flex-1 py-1.5 rounded font-black text-[10px] border transition-all ${
+                            glassStatusList[rowIdx]?.[0] === 'broken'
+                              ? 'bg-red-950/40 text-red-500 border-red-900 line-through'
+                              : glassStatusList[rowIdx]?.[0] === 'safe'
+                                ? 'bg-emerald-900/40 text-emerald-300 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
+                                : isNextInteractiveRow
+                                  ? 'bg-cyan-950/30 text-cyan-400 border-cyan-800 hover:bg-cyan-900/50 hover:border-cyan-500'
+                                  : 'bg-slate-950/50 text-slate-600 border-slate-800'
+                          }`}
+                          disabled={!isNextInteractiveRow || glassStatusList[rowIdx]?.[0] === 'broken'}
+                        >
+                          L {isCurrentPlayerRow && glassSequence[rowIdx] === 'L' && '👤'}
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            initAudio();
+                            if (glassActiveMode === 'step') jumpGlassBridge('R');
+                            else throwGlassMarble('R');
+                          }}
+                          className={`flex-1 py-1.5 rounded font-black text-[10px] border transition-all ${
+                            glassStatusList[rowIdx]?.[1] === 'broken'
+                              ? 'bg-red-950/40 text-red-500 border-red-900 line-through'
+                              : glassStatusList[rowIdx]?.[1] === 'safe'
+                                ? 'bg-emerald-900/40 text-emerald-300 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
+                                : isNextInteractiveRow
+                                  ? 'bg-cyan-950/30 text-cyan-400 border-cyan-800 hover:bg-cyan-900/50 hover:border-cyan-500'
+                                  : 'bg-slate-950/50 text-slate-600 border-slate-800'
+                          }`}
+                          disabled={!isNextInteractiveRow || glassStatusList[rowIdx]?.[1] === 'broken'}
+                        >
+                          R {isCurrentPlayerRow && glassSequence[rowIdx] === 'R' && '👤'}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="w-full mt-2.5 bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+                <div className="flex items-center justify-between mb-2 text-[9px] text-slate-400">
+                  <span>🔮 {language === 'mn' ? 'Шагай:' : 'Marbles:'} <strong className="text-emerald-400">{glassMarblesCount}</strong></span>
+                  <span>🏁 {language === 'mn' ? 'Байршил:' : 'Row:'} <strong className="text-pink-400">{glassCurrentRow + 1} / 8</strong></span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    onClick={() => setGlassActiveMode('step')}
+                    className={`py-1 rounded font-black text-[9px] uppercase transition-all ${
+                      glassActiveMode === 'step' ? 'bg-cyan-600 text-white' : 'bg-slate-950 text-slate-400 border border-slate-800'
+                    }`}
+                  >
+                    👣 {language === 'mn' ? 'АЛХАХ' : 'STEP'}
+                  </button>
+                  <button
+                    onClick={() => setGlassActiveMode('throw')}
+                    disabled={glassMarblesCount <= 0}
+                    className={`py-1 rounded font-black text-[9px] uppercase transition-all disabled:opacity-45 ${
+                      glassActiveMode === 'throw' ? 'bg-yellow-600 text-white' : 'bg-slate-950 text-slate-400 border border-slate-800'
+                    }`}
+                  >
+                    ☄️ {language === 'mn' ? 'ШИДЭХ' : 'THROW'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* GREEN / RED LIGHT ATMOSPHERIC SCREEN GLOW */}
           <div 
@@ -1499,29 +2238,78 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
           {/* HUD statistics while playing */}
           <div id="squid-hud" className="space-y-3 mb-4">
             {/* Tense light state banner */}
-            <div 
-              id="squid-state-banner"
-              className={`rounded-xl p-3 border-2 flex items-center justify-between transition-all duration-300 ${
-                gameState === 'playing'
-                  ? lightState === 'GREEN'
-                    ? 'bg-emerald-950/40 border-emerald-500/80 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-pulse'
-                    : 'bg-red-950/40 border-red-500/80 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
-                  : 'bg-slate-900 border-slate-800 text-slate-400'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${gameState === 'playing' ? (lightState === 'GREEN' ? 'bg-emerald-400' : 'bg-red-500') : 'bg-slate-500'}`} />
-                <span className="text-xs font-mono font-bold uppercase tracking-wider">
-                  {gameState === 'playing' ? (lightState === 'GREEN' ? t.greenLight : t.redLight) : 'STANDBY'}
+            {level === 1 ? (
+              <div 
+                id="squid-state-banner"
+                className={`rounded-xl p-3 border-2 flex items-center justify-between transition-all duration-300 ${
+                  gameState === 'playing'
+                    ? lightState === 'GREEN'
+                      ? 'bg-emerald-950/40 border-emerald-500/80 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-pulse'
+                      : 'bg-red-950/40 border-red-500/80 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
+                    : 'bg-slate-900 border-slate-800 text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${gameState === 'playing' ? (lightState === 'GREEN' ? 'bg-emerald-400' : 'bg-red-500') : 'bg-slate-500'}`} />
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider">
+                    {gameState === 'playing' ? (lightState === 'GREEN' ? t.greenLight : t.redLight) : 'STANDBY'}
+                  </span>
+                </div>
+                <span className="text-base font-black font-mono">
+                  {gameState === 'playing' ? (lightState === 'GREEN' ? t.runMsg : t.stopMsg) : '---'}
                 </span>
               </div>
-              <span className="text-base font-black font-mono">
-                {gameState === 'playing' ? (lightState === 'GREEN' ? t.runMsg : t.stopMsg) : '---'}
-              </span>
-            </div>
+            ) : level === 2 ? (
+              <div className="bg-amber-950/20 border border-amber-500/30 rounded-xl p-3 space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-amber-400 font-mono uppercase tracking-wider font-bold">🍯 {language === 'mn' ? 'Далгона хэлбэр' : 'Cookie Shape'}</span>
+                  <span className="px-2 py-0.5 rounded bg-amber-500 text-slate-950 font-black text-[10px] uppercase">{dalgonaShape}</span>
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-1 text-[10px] text-slate-400">
+                    <span>{language === 'mn' ? 'Бүтэн байдал' : 'Cookie Integrity'}</span>
+                    <span className={dalgonaIntegrity < 40 ? 'text-red-500 font-bold animate-pulse' : 'text-amber-300'}>{dalgonaIntegrity}%</span>
+                  </div>
+                  <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                    <div 
+                      className={`h-full transition-all duration-300 ${dalgonaIntegrity < 40 ? 'bg-red-500' : 'bg-amber-500'}`}
+                      style={{ width: `${dalgonaIntegrity}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : level === 3 ? (
+              <div className="bg-pink-950/10 border border-pink-500/20 rounded-xl p-3 space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-pink-400 font-mono uppercase tracking-wider font-bold">🪢 {language === 'mn' ? 'Олсны зөрүү' : 'Rope Status'}</span>
+                  <span className={`font-mono font-bold text-sm ${Math.abs(tugRopeOffset) > 40 ? 'text-red-500' : 'text-emerald-400'}`}>
+                    {tugRopeOffset > 0 ? `+${tugRopeOffset}px ➡️` : `${tugRopeOffset}px ⬅️`}
+                  </span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800 relative">
+                  <div className="absolute top-0 bottom-0 bg-pink-500 transition-all duration-150" style={{ left: '50%', width: `${(tugRopeOffset / 100) * 50}%` }} />
+                </div>
+              </div>
+            ) : level === 4 ? (
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-1.5 text-center">
+                <span className="text-[10px] font-mono text-pink-400 uppercase tracking-widest block font-bold">🔮 {language === 'mn' ? 'МӨРИЙТЭЙ ТОГЛООМ' : 'MARBLE SHOWDOWN'}</span>
+                <p className="text-xs text-slate-300 font-bold">
+                  {isPlayerDealer 
+                    ? (language === 'mn' ? 'Та шагайгаа нууж байна' : 'You are hiding marbles') 
+                    : (language === 'mn' ? 'Та таахыг оролдож байна' : 'You are guessing')}
+                </p>
+              </div>
+            ) : (
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-1.5 text-center">
+                <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest block font-bold">🌉 {language === 'mn' ? 'ШИЛЭН ГҮҮР' : 'TEMPERED GLASS BRIDGE'}</span>
+                <p className="text-xs text-slate-300 font-bold">
+                  {language === 'mn' ? 'Аюулгүй шилэн дээр гишгэнэ үү' : 'Find the safe path to cross the chasm'}
+                </p>
+              </div>
+            )}
 
             {/* Giant Doll progress chant bar */}
-            {gameState === 'playing' && (
+            {gameState === 'playing' && level === 1 && (
               <div id="squid-chant-bar-container" className="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
                 <div className="flex justify-between items-center mb-1 text-[10px] font-mono text-slate-400 uppercase">
                   <span>{language === 'mn' ? 'Хүүхэлдэйн дуу' : 'Doll Chant Track'}</span>
@@ -1583,76 +2371,152 @@ export default function GamerSquid({ onClose, language }: GamerSquidProps) {
           <div id="squid-control-pad" className="flex-1 flex flex-col justify-end mt-2 space-y-3">
             {gameState === 'playing' ? (
               <div className="space-y-3">
-                {/* Rhythm / stumble notification indicator */}
-                <div className="h-4 text-center">
-                  <AnimatePresence>
-                    {stumbleActive && (
-                      <motion.span 
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="text-xs text-red-500 font-bold tracking-wider"
+                {level === 1 ? (
+                  <>
+                    {/* Rhythm / stumble notification indicator */}
+                    <div className="h-4 text-center">
+                      <AnimatePresence>
+                        {stumbleActive && (
+                          <motion.span 
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="text-xs text-red-500 font-bold tracking-wider"
+                          >
+                            ⚠️ {t.stumble}
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Left & Right active tap foot buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        id="squid-step-left-btn"
+                        onClick={() => performStep('LEFT')}
+                        disabled={stumbleActive}
+                        className={`h-20 sm:h-24 rounded-2xl border-2 font-black transition-all flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-95 ${
+                          stumbleActive 
+                            ? 'bg-slate-900 border-red-500/20 text-slate-600 cursor-not-allowed'
+                            : lastFoot === 'LEFT'
+                              ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-500 opacity-60'
+                              : 'bg-slate-900 border-[#ec4899] hover:border-pink-500 text-white hover:bg-slate-800'
+                        }`}
                       >
-                        ⚠️ {t.stumble}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </div>
+                        <span className="text-2xl">🦶</span>
+                        <span className="text-xs tracking-wider font-semibold uppercase">{t.stepLeft}</span>
+                      </button>
 
-                {/* Left & Right active tap foot buttons */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    id="squid-step-left-btn"
-                    onClick={() => performStep('LEFT')}
-                    disabled={stumbleActive}
-                    className={`h-20 sm:h-24 rounded-2xl border-2 font-black transition-all flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-95 ${
-                      stumbleActive 
-                        ? 'bg-slate-900 border-red-500/20 text-slate-600 cursor-not-allowed'
-                        : lastFoot === 'LEFT'
-                          ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-500 opacity-60'
-                          : 'bg-slate-900 border-[#ec4899] hover:border-pink-500 text-white hover:bg-slate-800'
-                    }`}
-                  >
-                    <span className="text-2xl">🦶</span>
-                    <span className="text-xs tracking-wider font-semibold uppercase">{t.stepLeft}</span>
-                  </button>
+                      <button
+                        id="squid-step-right-btn"
+                        onClick={() => performStep('RIGHT')}
+                        disabled={stumbleActive}
+                        className={`h-20 sm:h-24 rounded-2xl border-2 font-black transition-all flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-95 ${
+                          stumbleActive 
+                            ? 'bg-slate-900 border-red-500/20 text-slate-600 cursor-not-allowed'
+                            : lastFoot === 'RIGHT'
+                              ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-500 opacity-60'
+                              : 'bg-slate-900 border-[#ec4899] hover:border-pink-500 text-white hover:bg-slate-800'
+                        }`}
+                      >
+                        <span className="text-2xl">🦶</span>
+                        <span className="text-xs tracking-wider font-semibold uppercase">{t.stepRight}</span>
+                      </button>
+                    </div>
 
-                  <button
-                    id="squid-step-right-btn"
-                    onClick={() => performStep('RIGHT')}
-                    disabled={stumbleActive}
-                    className={`h-20 sm:h-24 rounded-2xl border-2 font-black transition-all flex flex-col items-center justify-center gap-1 cursor-pointer select-none active:scale-95 ${
-                      stumbleActive 
-                        ? 'bg-slate-900 border-red-500/20 text-slate-600 cursor-not-allowed'
-                        : lastFoot === 'RIGHT'
-                          ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-500 opacity-60'
-                          : 'bg-slate-900 border-[#ec4899] hover:border-pink-500 text-white hover:bg-slate-800'
-                    }`}
-                  >
-                    <span className="text-2xl">🦶</span>
-                    <span className="text-xs tracking-wider font-semibold uppercase">{t.stepRight}</span>
-                  </button>
-                </div>
-
-                {/* Keyboard keys helper guide */}
-                <p className="text-center text-[10px] text-slate-500 font-mono">
-                  {language === 'mn' 
-                    ? '💡 Гараараа A болон D товчлуурыг ээлжилж даран урагшилж болно!' 
-                    : '💡 Use your keyboard A and D keys to alternate steps quickly!'}
-                </p>
+                    {/* Keyboard keys helper guide */}
+                    <p className="text-center text-[10px] text-slate-500 font-mono">
+                      {language === 'mn' 
+                        ? '💡 Гараараа A болон D товчлуурыг ээлжилж даран урагшилж болно!' 
+                        : '💡 Use your keyboard A and D keys to alternate steps quickly!'}
+                    </p>
+                  </>
+                ) : level === 2 ? (
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => {
+                        initAudio();
+                        lickDalgona();
+                      }}
+                      className="w-full py-4 sm:py-5 rounded-2xl border-2 border-amber-600 bg-amber-900/40 hover:bg-amber-900/60 text-amber-200 font-extrabold uppercase tracking-widest text-xs flex flex-col items-center justify-center gap-1 active:scale-95 transition-all shadow-[0_0_15px_rgba(245,158,11,0.2)]"
+                    >
+                      <span className="text-3xl">👅</span>
+                      <span>{language === 'mn' ? 'ШҮЛСЭЭР ДОЛООХ (ОНЬС СЭРГЭЭХ)' : 'LICK CANDY (RESTORE INTEGRITY)'}</span>
+                    </button>
+                    <p className="text-center text-[9px] text-slate-500 font-mono leading-relaxed">
+                      {language === 'mn' 
+                        ? '💡 Долоосноор чихрийн бүтэн байдлыг сэргээж, унах эрсдлийг бууруулна! Гэхдээ цаг алдаж буйг анхаарна уу.' 
+                        : '💡 Licking the candy restores its structural integrity but drains your precious time!'}
+                    </p>
+                  </div>
+                ) : level === 3 ? (
+                  <div className="space-y-3">
+                    <p className="text-center text-[10px] text-slate-500 font-mono animate-pulse">
+                      {language === 'mn' 
+                        ? '💡 Сум ногоон голд орох үед SPACEBAR эсвэл зүүн талын товчийг дараарай!' 
+                        : '💡 Hit SPACEBAR or the PULL button exactly when the indicator is in the green center!'}
+                    </p>
+                  </div>
+                ) : level === 4 ? (
+                  <div className="space-y-3">
+                    <p className="text-center text-[10px] text-slate-500 font-mono">
+                      {language === 'mn' 
+                        ? '💡 Сөргөгчийн бүх 10 шагайг хожсон тохиолдолд чи дараагийн шатанд орно.' 
+                        : '💡 Outsmart the opponent to claim all 10 marbles and secure your survival!'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-center text-[10px] text-slate-450 font-mono bg-slate-900 p-2 rounded border border-slate-800 leading-relaxed">
+                      {language === 'mn' 
+                        ? '💡 Түрүүлж шагай шидэж шилийг шалгаж болно! Шил хагарах юм бол дараагийн гишгүүр өөр сонголт байна.' 
+                        : '💡 Throw limited marbles to test glass safety! Tempered tiles reflect light, normal tiles explode.'}
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               // Instructions rulebook panel
               <div id="squid-rulebook" className="bg-slate-900/40 p-4 rounded-xl border border-slate-800 text-left space-y-3">
                 <p className="text-xs font-bold text-[#ec4899] uppercase tracking-widest flex items-center gap-1.5 border-b border-slate-800 pb-2">
                   <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                  <span>{t.rulesTitle}</span>
+                  <span>
+                    {level === 1 ? t.rulesTitle : language === 'mn' ? 'ҮЕИЙН ДҮРЭМ' : 'LEVEL RULES'}
+                  </span>
                 </p>
                 <div className="space-y-2 text-[11px] text-slate-300 leading-relaxed font-sans">
-                  <p>{t.rule1}</p>
-                  <p className="text-red-400">{t.rule2}</p>
-                  <p>{t.rule3}</p>
-                  <p>{t.rule4}</p>
+                  {level === 1 ? (
+                    <>
+                      <p>{t.rule1}</p>
+                      <p className="text-red-400">{t.rule2}</p>
+                      <p>{t.rule3}</p>
+                      <p>{t.rule4}</p>
+                    </>
+                  ) : level === 2 ? (
+                    <>
+                      <p>1. {language === 'mn' ? 'Зүүний улаан анивчиж буй цэгүүд дээр дараалж даран чихрийг зүснэ.' : 'Click or tap the blinking red target dots along the shape outline.'}</p>
+                      <p className="text-red-400">2. {language === 'mn' ? 'Хэрэв буруу газар дарвал чихэр хагарч тоглоом дуусна!' : 'Clicking off-target damages the cookie integrity. At 0%, it shatters!'}</p>
+                      <p>3. {language === 'mn' ? 'Долоох товчийг дарж чихрийн бүтэн байдлыг дахин сэргээж болно.' : 'Use the Lick Candy action to safely repair damaged integrity.'}</p>
+                    </>
+                  ) : level === 3 ? (
+                    <>
+                      <p>1. {language === 'mn' ? 'Олс татах хүч хэмжигч зүүний хэлбэлзлийг анхааралтай ажиглана.' : 'Observe the oscillating tension indicator needle closely.'}</p>
+                      <p className="text-red-400">2. {language === 'mn' ? 'Зүү ногоон хэсэгт орсон яг тэр агшинд уу товч эсвэл SPACEBAR-г дараарай!' : 'Press SPACEBAR or the PULL button exactly when the needle hits the green center!'}</p>
+                      <p>3. {language === 'mn' ? 'Зөрүү ихсэж хязгаарт хүрвэл чи унана.' : 'If the rope gets pulled too far to the guard side, your team falls!'}</p>
+                    </>
+                  ) : level === 4 ? (
+                    <>
+                      <p>1. {language === 'mn' ? 'Таны ээлж ирэхэд гартаа хэдэн шагай нуухаа сонгож өрсөлдөгчөө таалгана.' : 'When you are the dealer, hide 1 to 5 marbles in your fist.'}</p>
+                      <p className="text-red-400">2. {language === 'mn' ? 'Өрсөлдөгчийн ээлж ирэхэд дэнчин тавьж ТЭГШ эсвэл СОНДГОЙ-г таана.' : 'When the opponent is the dealer, choose your bet and guess ODD or EVEN.'}</p>
+                      <p>3. {language === 'mn' ? 'Сөргөгчийн бүх 10 шагайг хожсон тохиолдолд амьд үлдэнэ!' : 'Take all 10 marbles from the opponent to secure your survival.'}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>1. {language === 'mn' ? 'Алхах горимыг сонгоод Зүүн (L) эсвэл Баруун (R) шилийг сонгож харайгаарай.' : 'Choose STEP mode, then click L or R of the next row to jump.'}</p>
+                      <p className="text-red-400">2. {language === 'mn' ? 'Нэг шил нь аюулгүй хатуу шил, нөгөө нь шууд хагарах энгийн шил байна.' : 'One tile is tempered glass, the other is normal and shatters instantly.'}</p>
+                      <p>3. {language === 'mn' ? 'ШИДЭХ горимыг сонгон шагай шидэж шилний бат бэхийг урьдчилж шалгана уу.' : 'Switch to THROW mode to toss a limited marble and test the glass safely.'}</p>
+                    </>
+                  )}
                 </div>
               </div>
             )}
