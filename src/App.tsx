@@ -8,6 +8,9 @@ import GamerVault from './components/GamerVault';
 import GamerArcade from './components/GamerArcade';
 import GamerRadio from './components/GamerRadio';
 import GamerSurvival from './components/GamerSurvival';
+import GamerAnimeGuess from './components/GamerAnimeGuess';
+import GamerSquid from './components/GamerSquid';
+import GamerObby from './components/GamerObby';
 
 export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -15,6 +18,9 @@ export default function App() {
   const [gamerArcadeOpen, setGamerArcadeOpen] = useState(false);
   const [gamerRadioOpen, setGamerRadioOpen] = useState(false);
   const [gamerSurvivalOpen, setGamerSurvivalOpen] = useState(false);
+  const [gamerAnimeGuessOpen, setGamerAnimeGuessOpen] = useState(false);
+  const [gamerSquidOpen, setGamerSquidOpen] = useState(false);
+  const [gamerObbyOpen, setGamerObbyOpen] = useState(false);
   const [hoverGamerBadge, setHoverGamerBadge] = useState(false);
 
   // Staggered fadeUp animation for hero elements
@@ -98,24 +104,31 @@ export default function App() {
         </div>
 
         {/* Right: Desktop Action CTAs - Fully functional */}
-        <div className="hidden md:flex items-center gap-4">
+        <div className="hidden md:flex flex-wrap items-center justify-end gap-2 lg:gap-3 xl:gap-4 max-w-[75%]">
+          <button
+            onClick={() => window.open('https://bold-game.vercel.app/', '_blank')}
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-bold bg-white/80 backdrop-blur-md border border-[#CFC8C5] hover:border-amber-500 hover:bg-white text-[#192837] transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+          >
+            <span>⌨️ Typeracer</span>
+          </button>
+
           <button
             onClick={() => setGamerRadioOpen(true)}
-            className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white/80 backdrop-blur-md border border-[#CFC8C5] hover:border-cyan-500 hover:bg-white text-[#192837] transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-semibold bg-white/80 backdrop-blur-md border border-[#CFC8C5] hover:border-cyan-500 hover:bg-white text-[#192837] transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
           >
             <span>Хөгжмийн булан 🎵</span>
           </button>
 
           <button
             onClick={() => setGamerVaultOpen(true)}
-            className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white/80 backdrop-blur-md border border-[#CFC8C5] hover:border-[#7342E2] hover:bg-white text-[#192837] transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-semibold bg-white/80 backdrop-blur-md border border-[#CFC8C5] hover:border-[#7342E2] hover:bg-white text-[#192837] transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
           >
             <span>Миний Сейф 🔐</span>
           </button>
           
           <button
             onClick={() => setGamerArcadeOpen(true)}
-            className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#7342E2] hover:bg-opacity-95 hover:shadow-lg text-white transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-semibold bg-[#7342E2] hover:bg-opacity-95 hover:shadow-lg text-white transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
             style={{ boxShadow: '0 4px 14px rgba(115,66,226,0.25)' }}
           >
             <span>Буудагч 🎮</span>
@@ -123,10 +136,34 @@ export default function App() {
 
           <button
             onClick={() => setGamerSurvivalOpen(true)}
-            className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#10B981] hover:bg-opacity-95 hover:shadow-lg text-white transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-semibold bg-[#10B981] hover:bg-opacity-95 hover:shadow-lg text-white transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
             style={{ boxShadow: '0 4px 14px rgba(16,185,129,0.25)' }}
           >
             <span>Амьд үлдэх ⚔️</span>
+          </button>
+
+          <button
+            onClick={() => setGamerAnimeGuessOpen(true)}
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-semibold bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-95 hover:shadow-lg text-white transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            style={{ boxShadow: '0 4px 14px rgba(168,85,247,0.25)' }}
+          >
+            <span>Аниме Таагч 🌸</span>
+          </button>
+
+          <button
+            onClick={() => setGamerSquidOpen(true)}
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-bold bg-[#111827] border-2 border-[#ec4899] hover:bg-[#ec4899] text-white hover:shadow-lg transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            style={{ boxShadow: '0 4px 14px rgba(236,72,153,0.3)' }}
+          >
+            <span>🦑 О징 Тэмцэл</span>
+          </button>
+
+          <button
+            onClick={() => setGamerObbyOpen(true)}
+            className="px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-sm font-bold bg-[#4f46e5] border border-indigo-400 hover:bg-indigo-500 text-white hover:shadow-lg transition-all duration-200 cursor-pointer active:scale-95 flex items-center gap-1.5"
+            style={{ boxShadow: '0 4px 14px rgba(79,70,229,0.3)' }}
+          >
+            <span>🏃‍♂️ Обби Саад</span>
           </button>
         </div>
 
@@ -326,6 +363,21 @@ export default function App() {
 
                 {/* Staggered Nav Links */}
                 <div className="flex flex-col gap-6">
+                  {/* Typeracer link */}
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1, duration: 0.3 }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      window.open('https://bold-game.vercel.app/', '_blank');
+                    }}
+                    className="flex items-center gap-3 text-xl font-extrabold text-amber-600 text-left hover:opacity-80 transition-opacity"
+                  >
+                    <span className="text-2xl">⌨️</span>
+                    <span>Typeracer</span>
+                  </motion.button>
+
                   {/* Special Mobile Gaming Safe link */}
                   <motion.button
                     initial={{ opacity: 0, x: 20 }}
@@ -385,6 +437,51 @@ export default function App() {
                     <Radio className="w-6 h-6 animate-pulse" />
                     <span>Хөгжмийн булан 🎵</span>
                   </motion.button>
+
+                  {/* Special Mobile Anime Guess link */}
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.32, duration: 0.3 }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setGamerAnimeGuessOpen(true);
+                    }}
+                    className="flex items-center gap-3 text-xl font-extrabold text-purple-400 text-left hover:opacity-80 transition-opacity"
+                  >
+                    <Sparkles className="w-6 h-6 animate-pulse text-pink-500" />
+                    <span>Аниме Таагч 🌸</span>
+                  </motion.button>
+
+                  {/* Special Mobile Squid Game link */}
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.35, duration: 0.3 }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setGamerSquidOpen(true);
+                    }}
+                    className="flex items-center gap-3 text-xl font-extrabold text-[#ec4899] text-left hover:opacity-80 transition-opacity"
+                  >
+                    <span className="text-2xl animate-pulse">🦑</span>
+                    <span>О징 Тэмцэл 🔴🟢</span>
+                  </motion.button>
+
+                  {/* Special Mobile Obby Game link */}
+                  <motion.button
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.38, duration: 0.3 }}
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      setGamerObbyOpen(true);
+                    }}
+                    className="flex items-center gap-3 text-xl font-extrabold text-indigo-400 text-left hover:opacity-80 transition-opacity"
+                  >
+                    <span className="text-2xl animate-pulse">🏃‍♂️</span>
+                    <span>Обби Саад 🧗‍♂️</span>
+                  </motion.button>
                 </div>
               </div>
 
@@ -418,6 +515,27 @@ export default function App() {
       <AnimatePresence>
         {gamerSurvivalOpen && (
           <GamerSurvival onClose={() => setGamerSurvivalOpen(false)} language="mn" />
+        )}
+      </AnimatePresence>
+
+      {/* 9. Custom Interactive Anime Guessing Game Modal */}
+      <AnimatePresence>
+        {gamerAnimeGuessOpen && (
+          <GamerAnimeGuess onClose={() => setGamerAnimeGuessOpen(false)} language="mn" />
+        )}
+      </AnimatePresence>
+
+      {/* 10. Squid Game "Red Light, Green Light" Modal */}
+      <AnimatePresence>
+        {gamerSquidOpen && (
+          <GamerSquid onClose={() => setGamerSquidOpen(false)} language="mn" />
+        )}
+      </AnimatePresence>
+
+      {/* 11. Custom Obby Game Modal */}
+      <AnimatePresence>
+        {gamerObbyOpen && (
+          <GamerObby onClose={() => setGamerObbyOpen(false)} language="mn" />
         )}
       </AnimatePresence>
 
